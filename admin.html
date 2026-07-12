@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ريان باك | لوحة التحكم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Login gate -->
+<div class="login-gate" id="loginGate">
+  <div class="login-card">
+    <div class="brand-mark">ر</div>
+    <h2>لوحة تحكم ريان باك</h2>
+    <p>الدخول للأدمن فقط</p>
+    <div class="login-error" id="loginError"></div>
+    <input type="password" id="passInput" placeholder="كلمة المرور" autocomplete="off">
+    <button id="loginBtn">دخول</button>
+  </div>
+</div>
+
+<div id="appRoot" class="app-hidden">
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="brand-mark">ر</div>
+      <div class="brand-text">
+        <h1>ريان باك للتعبئة والتغليف <span class="admin-tag">لوحة التحكم</span></h1>
+        <span>عرض داخلي كامل — كل المنتجات وكل الحالات</span>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="ابحث عن منتج... مثال: كوب 12 اونز">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </div>
+    <div class="stats" id="statsBar"></div>
+    <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
+  </div>
+</header>
+<div class="flute"></div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="filters" id="filterChips">
+      <button class="filter-chip active" data-f="all">الكل</button>
+      <button class="filter-chip" data-f="available">متاح فقط</button>
+    </div>
+    <h3>الأقسام</h3>
+    <div id="catList"></div>
+  </aside>
+
+  <main class="content">
+    <div class="contact-bar">
+      <span>📞 <b>01555611536 / 01211145111 / 01100328631</b></span>
+      <span>✉️ <b>backrayan@gmail.com</b></span>
+      <span>🌐 <b>alrayanpack.com</b></span>
+    </div>
+    <div class="admin-toolbar">
+      <span class="pending" id="pendingBadge">مفيش تعديلات محلية</span>
+      <button class="btn-reset" id="resetBtn">إلغاء كل التعديلات</button>
+      <button class="btn-export" id="exportBtn">⬇ تنزيل data.js بعد التعديل</button>
+    </div>
+    <div id="results"></div>
+  </main>
+</div>
+
+<footer class="foot">لوحة داخلية لريان باك — لتحديث الأسعار ابعت ملف الإكسل المحدث</footer>
+</div>
+
+<script src="data.js"></script>
+<script>window.__deferRender = true; window.IS_ADMIN = true;</script>
+<script src="render.js"></script>
+<script>
+  const ADMIN_PASSWORD = 'rayan@2026';
+  const gate = document.getElementById('loginGate');
+  const root = document.getElementById('appRoot');
+  const errEl = document.getElementById('loginError');
+  const passInput = document.getElementById('passInput');
+
+  function unlock(){
+    gate.style.display = 'none';
+    root.classList.remove('app-hidden');
+    if(!window.__rendered){ window.__rendered = true; renderApp(); }
+  }
+
+  if(sessionStorage.getItem('rayan_admin_auth') === '1'){
+    unlock();
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', tryLogin);
+  passInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryLogin(); });
+
+  function tryLogin(){
+    if(passInput.value === ADMIN_PASSWORD){
+      sessionStorage.setItem('rayan_admin_auth', '1');
+      errEl.textContent = '';
+      unlock();
+    } else {
+      errEl.textContent = 'كلمة المرور غلط، جرب تاني';
+      passInput.value = '';
+      passInput.focus();
+    }
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    sessionStorage.removeItem('rayan_admin_auth');
+    location.reload();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', function(){
+    if(window.__exportData) window.__exportData();
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if(window.__resetEdits) window.__resetEdits();
+  });
+</script>
+</body>
+</html>

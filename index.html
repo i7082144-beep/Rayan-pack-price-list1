@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ريان باك | قائمة الأسعار</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="brand-mark">ر</div>
+      <div class="brand-text">
+        <h1>ريان باك للتعبئة والتغليف</h1>
+        <span>قائمة الأسعار — Rayan Pack</span>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="ابحث عن منتج... مثال: كوب 12 اونز">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    </div>
+    <div class="stats" id="statsBar"></div>
+  </div>
+</header>
+<div class="flute"></div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="filters" id="filterChips">
+      <button class="filter-chip active" data-f="all">الكل</button>
+      <button class="filter-chip" data-f="available">متاح فقط</button>
+    </div>
+    <h3>الأقسام</h3>
+    <div id="catList"></div>
+  </aside>
+
+  <main class="content">
+    <div class="contact-bar">
+      <span>📞 <b>01555611536 / 01211145111 / 01100328631</b></span>
+      <span>✉️ <b>backrayan@gmail.com</b></span>
+      <span>🌐 <b>alrayanpack.com</b></span>
+    </div>
+    <div id="results"></div>
+  </main>
+</div>
+
+<footer class="foot">الأسعار غير ثابتة وقابلة للتغيير — للاستفسار والتواصل مع ريان باك مباشرة</footer>
+
+<script src="data.js"></script>
+<script src="render.js"></script>
+</body>
+</html>

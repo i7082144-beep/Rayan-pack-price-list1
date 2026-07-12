@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ريان باك | لوحة التحكم</title>
+<title>ريان باك | قائمة الأسعار</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,26 +11,13 @@
 </head>
 <body>
 
-<!-- Login gate -->
-<div class="login-gate" id="loginGate">
-  <div class="login-card">
-    <div class="brand-mark">ر</div>
-    <h2>لوحة تحكم ريان باك</h2>
-    <p>الدخول للأدمن فقط</p>
-    <div class="login-error" id="loginError"></div>
-    <input type="password" id="passInput" placeholder="كلمة المرور" autocomplete="off">
-    <button id="loginBtn">دخول</button>
-  </div>
-</div>
-
-<div id="appRoot" class="app-hidden">
 <header class="top">
   <div class="top-row">
     <div class="brand">
       <div class="brand-mark">ر</div>
       <div class="brand-text">
-        <h1>ريان باك للتعبئة والتغليف <span class="admin-tag">لوحة التحكم</span></h1>
-        <span>عرض داخلي كامل — كل المنتجات وكل الحالات</span>
+        <h1>ريان باك للتعبئة والتغليف</h1>
+        <span>قائمة الأسعار — Rayan Pack</span>
       </div>
     </div>
     <div class="search-wrap">
@@ -38,7 +25,6 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
     </div>
     <div class="stats" id="statsBar"></div>
-    <button class="logout-btn" id="logoutBtn">تسجيل خروج</button>
   </div>
 </header>
 <div class="flute"></div>
@@ -59,98 +45,76 @@
       <span>✉️ <b>backrayan@gmail.com</b></span>
       <span>🌐 <b>alrayanpack.com</b></span>
     </div>
-    <div class="admin-toolbar">
-      <span class="pending" id="pendingBadge">مفيش تعديلات محلية</span>
-      <button class="btn-reset" id="resetBtn">إلغاء كل التعديلات</button>
-      <button class="btn-export" id="exportBtn">⬇ تنزيل data.js بعد التعديل</button>
-    </div>
     <div id="results"></div>
   </main>
 </div>
 
-<footer class="foot">لوحة داخلية لريان باك — لتحديث الأسعار ابعت ملف الإكسل المحدث</footer>
-</div>
+<footer class="foot">الأسعار غير ثابتة وقابلة للتغيير — للاستفسار والتواصل مع ريان باك مباشرة</footer>
 
 <script src="data.js"></script>
-<script>window.__deferRender = true; window.IS_ADMIN = true;</script>
 <script src="render.js"></script>
-<script>
-  const ADMIN_PASSWORD = 'rayan@2026';
-  const gate = document.getElementById('loginGate');
-  const root = document.getElementById('appRoot');
-  const errEl = document.getElementById('loginError');
-  const passInput = document.getElementById('passInput');
-
-  function unlock(){
-    gate.style.display = 'none';
-    root.classList.remove('app-hidden');
-    if(!window.__rendered){ window.__rendered = true; renderApp(); }
-  }
-
-  if(sessionStorage.getItem('rayan_admin_auth') === '1'){
-    unlock();
-  }
-
-  document.getElementById('loginBtn').addEventListener('click', tryLogin);
-  passInput.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryLogin(); });
-
-  function tryLogin(){
-    if(passInput.value === ADMIN_PASSWORD){
-      sessionStorage.setItem('rayan_admin_auth', '1');
-      errEl.textContent = '';
-      unlock();
-    } else {
-      errEl.textContent = 'كلمة المرور غلط، جرب تاني';
-      passInput.value = '';
-      passInput.focus();
-    }
-  }
-
-  document.getElementById('logoutBtn').addEventListener('click', function(){
-    sessionStorage.removeItem('rayan_admin_auth');
-    location.reload();
-  });
-
-  document.getElementById('exportBtn').addEventListener('click', function(){
-    if(window.__exportData) window.__exportData();
-  });
-  document.getElementById('resetBtn').addEventListener('click', function(){
-    if(window.__resetEdits) window.__resetEdits();
-  });
-</script>
   <script>
 const BIN_ID = "ضع_BIN_ID_هنا";
 const API_KEY = "ضع_X-Master-Key_هنا";
 
-async function loadProducts() {
-  try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-      headers: { "X-Master-Key": API_KEY }
-    });
-    const data = await res.json();
-    const products = data.record; // ده الـ array بتاع المنتجات
+let products = []; // هتتخزن فيها المنتجات وقت التعديل
 
-    renderProducts(products); // استبدل دي بالفانكشن اللي عندك بتعرض المنتجات
+// تحميل المنتجات أول ما الداشبورد يفتح
+async function loadProducts() {
+  const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+    headers: { "X-Master-Key": API_KEY }
+  });
+  const data = await res.json();
+  products = data.record;
+  renderAdminTable(products); // استبدلها بفانكشن عرض الجدول عندك
+}
+
+// حفظ التعديلات ورفعها لـ JSONBin
+async function saveProducts() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Master-Key": API_KEY
+      },
+      body: JSON.stringify(products)
+    });
+    if (res.ok) {
+      alert("✅ اتحفظ التعديل وهيظهر لكل الزوار");
+    } else {
+      alert("❌ حصل خطأ في الحفظ");
+    }
   } catch (err) {
-    console.error("خطأ في تحميل المنتجات:", err);
+    console.error(err);
+    alert("❌ فشل الاتصال بالسيرفر");
   }
 }
 
-function renderProducts(products) {
-  const container = document.getElementById("products-container"); // غيّر الـ id ده لو مختلف عندك
-  container.innerHTML = "";
+// مثال: تعديل سعر منتج معيّن
+function updatePrice(productId, newPrice) {
+  const product = products.find(p => p.id === productId);
+  if (product) {
+    product.price = newPrice;
+    saveProducts(); // يحفظ فورًا بعد كل تعديل
+  }
+}
+
+function renderAdminTable(products) {
+  const table = document.getElementById("admin-table"); // غيّر الـ id لو مختلف
+  table.innerHTML = "";
   products.forEach(p => {
-    container.innerHTML += `
-      <div class="product-card">
-        <h3>${p.name}</h3>
-        <p>${p.price} ج.م</p>
-        <span>${p.category}</span>
-      </div>
+    table.innerHTML += `
+      <tr>
+        <td>${p.name}</td>
+        <td><input type="number" value="${p.price}" onchange="updatePrice('${p.id}', this.value)"></td>
+        <td>${p.category}</td>
+      </tr>
     `;
   });
 }
 
-loadProducts(); // ينفذ أول ما الصفحة تفتح
+loadProducts();
 </script>
 </body>
 </html>

@@ -118,5 +118,39 @@
     if(window.__resetEdits) window.__resetEdits();
   });
 </script>
+  <script>
+const BIN_ID = "ضع_BIN_ID_هنا";
+const API_KEY = "ضع_X-Master-Key_هنا";
+
+async function loadProducts() {
+  try {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+      headers: { "X-Master-Key": API_KEY }
+    });
+    const data = await res.json();
+    const products = data.record; // ده الـ array بتاع المنتجات
+
+    renderProducts(products); // استبدل دي بالفانكشن اللي عندك بتعرض المنتجات
+  } catch (err) {
+    console.error("خطأ في تحميل المنتجات:", err);
+  }
+}
+
+function renderProducts(products) {
+  const container = document.getElementById("products-container"); // غيّر الـ id ده لو مختلف عندك
+  container.innerHTML = "";
+  products.forEach(p => {
+    container.innerHTML += `
+      <div class="product-card">
+        <h3>${p.name}</h3>
+        <p>${p.price} ج.م</p>
+        <span>${p.category}</span>
+      </div>
+    `;
+  });
+}
+
+loadProducts(); // ينفذ أول ما الصفحة تفتح
+</script>
 </body>
 </html>
